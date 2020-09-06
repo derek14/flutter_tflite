@@ -487,6 +487,7 @@ public class TflitePlugin implements MethodCallHandler {
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
     float[][] similarity;
+    Object[] inputs;
 
     RunSiameseOnImages(HashMap args, Result result) throws IOException {
       super(args, result);
@@ -503,7 +504,7 @@ public class TflitePlugin implements MethodCallHandler {
       x2 = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
 
       startTime = SystemClock.uptimeMillis();
-      Object[] inputs = { x1 , x2 };
+      this.inputs = new Object[]{ x1 , x2 };
       
       outputs.put(0, new float[1][1]);
     }
