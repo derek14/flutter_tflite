@@ -486,7 +486,8 @@ public class TflitePlugin implements MethodCallHandler {
     ByteBuffer x2;
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
-    float[][] outputs;
+    float[][] similarity;
+    float[][] dissimilarity;
     Object[] inputs;
 
     RunSiameseOnImages(HashMap args, Result result) throws IOException {
