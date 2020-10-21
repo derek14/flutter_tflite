@@ -516,9 +516,6 @@ public class TflitePlugin implements MethodCallHandler {
     protected void onRunTfliteDone() {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
       similarity = ( float[][] )outputs.get( 0 ) ;
-      Log.v("similarity", "Similarity " + similarity);
-      
-      Log.v("similarity", "Similarity " + similarity[0]);
       Log.v("similarity", "Similarity " + similarity[0][0]);
 
       result.success(similarity[0][0]);
