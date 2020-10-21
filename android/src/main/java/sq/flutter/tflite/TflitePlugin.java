@@ -521,7 +521,7 @@ public class TflitePlugin implements MethodCallHandler {
       Log.v("similarity", "Similarity " + similarity);
       
       Log.v("similarity", "Similarity " + similarity[0]);
-      Log.v("dissimilarity", "Disimilarity " + dissimilarity[0][);
+      Log.v("dissimilarity", "Disimilarity " + dissimilarity[0]);
       result.success(similarity[0]);
     }
   }
