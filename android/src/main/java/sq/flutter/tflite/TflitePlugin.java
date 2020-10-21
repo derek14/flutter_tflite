@@ -486,8 +486,8 @@ public class TflitePlugin implements MethodCallHandler {
     ByteBuffer x2;
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
-    float[][] similarity;
-    float[][] dissimilarity;
+    float[] similarity;
+    float[] dissimilarity;
     Object[] inputs;
 
     RunSiameseOnImages(HashMap args, Result result) throws IOException {
@@ -520,9 +520,9 @@ public class TflitePlugin implements MethodCallHandler {
       dissimilarity = ( float[] )outputs.get( 1 ) ;
       Log.v("similarity", "Similarity " + similarity);
       
-      Log.v("similarity", "Similarity " + similarity[0][0]);
-      Log.v("dissimilarity", "Disimilarity " + dissimilarity[0][0]);
-      result.success(similarity[0][0]);
+      Log.v("similarity", "Similarity " + similarity[0]);
+      Log.v("dissimilarity", "Disimilarity " + dissimilarity[0][);
+      result.success(similarity[0]);
     }
   }
 
