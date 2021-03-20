@@ -26,15 +26,13 @@ class Tflite {
   }
 
   static Future<double> runSiameseOnImages(
-      {@required String testPath,
-      @required String triggerPath,
+      {@required String triggerPath,
       double imageMean = 117.0,
       double imageStd = 1.0,
       bool asynch = true}) async {
     return await _channel.invokeMethod(
       'runSiameseOnImages',
       {
-        "testPath": testPath,
         "triggerPath": triggerPath,
         "imageMean": imageMean,
         "imageStd": imageStd,

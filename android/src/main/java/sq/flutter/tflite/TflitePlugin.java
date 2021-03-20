@@ -482,43 +482,33 @@ public class TflitePlugin implements MethodCallHandler {
   }
 
   private class RunSiameseOnImages extends TfliteTask {
-    ByteBuffer x1;
-    ByteBuffer x2;
+    ByteBuffer input;
     long startTime;
-    Map<Integer, Object> outputs = new HashMap<>();
-    float[][] similarity;
     Object[] inputs;
+    float[][] embeddings;
 
     RunSiameseOnImages(HashMap args, Result result) throws IOException {
       super(args, result);
 
-      String testPath = args.get("testPath").toString();
       String triggerPath = args.get("triggerPath").toString();
-
       double mean = (double) (args.get("imageMean"));
       float IMAGE_MEAN = (float) mean;
       double std = (double) (args.get("imageStd"));
       float IMAGE_STD = (float) std;
       
-      x1 = feedInputTensorImage(testPath, IMAGE_MEAN, IMAGE_STD);
-      x2 = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
-
       startTime = SystemClock.uptimeMillis();
-      this.inputs = new Object[]{ x1 , x2 };
-      
-      outputs.put(0, new float[1][1]);
+      input = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
     }
 
     protected void runTflite() {
-      tfLite.runForMultipleInputsOutputs(inputs, outputs);
+      tfLite.run(input, embeddings);
     }
 
     protected void onRunTfliteDone() {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
-      similarity = ( float[][] )outputs.get( 0 ) ;
-      Log.v("similarity", "Similarity " + similarity[0][0]);
+      Log.v("embeddings", "Embeddings " + embeddings);
 
-      result.success(similarity[0][0]);
+      result.success(embeddings[0][0]);
     }
   }
 
