@@ -502,7 +502,7 @@ public class TflitePlugin implements MethodCallHandler {
       input = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
 
       this.inputs = new Object[]{ input };
-      outputs.put(0, new float[1][1]);
+      outputs.put(0, new float[1][512]);
     }
 
     protected void runTflite() {
