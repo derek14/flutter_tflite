@@ -485,6 +485,7 @@ public class TflitePlugin implements MethodCallHandler {
     ByteBuffer input;
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
+    float[][] similarity;
     Object[] inputs;
     float[][] embeddings;
 
@@ -499,18 +500,19 @@ public class TflitePlugin implements MethodCallHandler {
       
       startTime = SystemClock.uptimeMillis();
       input = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
-      
+
+      this.inputs = new Object[]{ input };
       outputs.put(0, new float[1][1]);
     }
 
     protected void runTflite() {
-      tfLite.runForMultipleInputsOutputs(input, outputs);
+      tfLite.runForMultipleInputsOutputs(inputs, outputs);
     }
 
     protected void onRunTfliteDone() {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
       embeddings = ( float[][] )outputs.get( 0 ) ;
-      Log.v("embeddings", "Embeddings " + embeddings[0][0]);
+      Log.v("similarity", "Similarity " + embeddings[0][0]);
 
       result.success(embeddings[0][0]);
     }
