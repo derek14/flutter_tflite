@@ -484,6 +484,7 @@ public class TflitePlugin implements MethodCallHandler {
   private class RunSiameseOnImages extends TfliteTask {
     ByteBuffer input;
     long startTime;
+    Map<Integer, Object> outputs = new HashMap<>();
     Object[] inputs;
     float[][] embeddings;
 
@@ -498,15 +499,18 @@ public class TflitePlugin implements MethodCallHandler {
       
       startTime = SystemClock.uptimeMillis();
       input = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
+      
+      outputs.put(0, new float[1][1]);
     }
 
     protected void runTflite() {
-      tfLite.run(input, embeddings);
+      tfLite.runForMultipleInputsOutputs(inputs, outputs);
     }
 
     protected void onRunTfliteDone() {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
-      Log.v("embeddings", "Embeddings " + embeddings);
+      embeddings = ( float[][] )outputs.get( 0 ) ;
+      Log.v("embeddings", "Embeddings " + embeddings[0][0]);
 
       result.success(embeddings[0][0]);
     }
