@@ -25,7 +25,7 @@ class Tflite {
     );
   }
 
-  static Future<double> runSiameseOnImages(
+  static Future<List> runSiameseOnImages(
       {@required String triggerPath,
       double imageMean = 117.0,
       double imageStd = 1.0,
