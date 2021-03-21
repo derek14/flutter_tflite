@@ -519,8 +519,6 @@ public class TflitePlugin implements MethodCallHandler {
       for (int x = 0; x < 512; ++x) {
         results.add(embeddings[0][x]);
       };
-      
-      Log.v("results", "Results " + results);
 
       result.success(results);
     }
