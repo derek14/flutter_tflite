@@ -513,8 +513,12 @@ public class TflitePlugin implements MethodCallHandler {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
       // embeddings = ( float[][] )outputs.get( 0 ) ;
       // Log.v("similarity", "Similarity " + embeddings[0]);
+
+      Map<String, Object> ret = new HashMap<>();
+      ret.put("embeddomg", outputs.get(0));
+
       List<Map<String, Object>> results = new ArrayList<>();
-      results.add(outputs.get(0));
+      results.add(ret);
 
       result.success(results);
     }
