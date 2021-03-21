@@ -514,14 +514,13 @@ public class TflitePlugin implements MethodCallHandler {
       embeddings = ( float[][] )outputs.get( 0 ) ;
 
       Map<String, Object> ret = new HashMap<>();
-      List<Map<String, Object>> results = new ArrayList<>();
+      List<Object> results = new ArrayList<>();
 
       for (int x = 0; x < 512; ++x) {
-        ret.put("embeddings", embeddings[0][x]);
-        results.add(ret);
+        results.add(embeddings[0][x]);
       };
       
-      Log.v("results", "Ret " + ret);
+      Log.v("results", "Results " + results);
 
       result.success(results);
     }
