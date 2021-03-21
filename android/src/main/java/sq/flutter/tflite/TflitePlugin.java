@@ -512,10 +512,12 @@ public class TflitePlugin implements MethodCallHandler {
     protected void onRunTfliteDone() {
       Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
       embeddings = ( float[][] )outputs.get( 0 ) ;
-      Log.v("embeddings", "Embeddings " + embeddings[0]);
 
       Map<String, Object> ret = new HashMap<>();
-      ret.put("embeddings", embeddings);
+      for (int x = 0; x < 512; ++x) {
+        ret.put("embeddings", embeddings[0][x]);
+      };
+      
       Log.v("ret", "Ret " + ret);
 
       List<Map<String, Object>> results = new ArrayList<>();
