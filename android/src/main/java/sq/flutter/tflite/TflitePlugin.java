@@ -100,9 +100,9 @@ public class TflitePlugin implements MethodCallHandler {
       } catch (Exception e) {
         result.error("Failed to load model", e.getMessage(), e);
       }
-    } else if (call.method.equals("runSiameseOnImages")) {
+    } else if (call.method.equals("runDegOnImages")) {
       try {
-        new RunSiameseOnImages((HashMap) call.arguments, result).executeTfliteTask();
+        new RunDegOnImages((HashMap) call.arguments, result).executeTfliteTask();
       } catch (Exception e) {
         result.error("Failed to run model", e.getMessage(), e);
       }
@@ -372,34 +372,6 @@ public class TflitePlugin implements MethodCallHandler {
       }
     }
 
-    // if (tensor.dataType() == DataType.FLOAT32) {
-    //   for (int i = 0; i < inputSize; ++i) {
-    //     for (int j = 0; j < inputSize; ++j) {
-    //       int pixelValue = bitmap.getPixel(j, i);
-    //       if (inputChannels > 1){
-    //         imgData.putFloat((((pixelValue >> 16) & 0xFF) - mean) / std);
-    //         imgData.putFloat((((pixelValue >> 8) & 0xFF) - mean) / std);
-    //         imgData.putFloat(((pixelValue & 0xFF) - mean) / std);
-    //       } else {
-    //         imgData.putFloat((((pixelValue >> 16 | pixelValue >> 8 | pixelValue) & 0xFF) - mean) / std);
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   for (int i = 0; i < inputSize; ++i) {
-    //     for (int j = 0; j < inputSize; ++j) {
-    //       int pixelValue = bitmap.getPixel(j, i);
-    //       if (inputChannels > 1){
-    //         imgData.put((byte) ((pixelValue >> 16) & 0xFF));
-    //         imgData.put((byte) ((pixelValue >> 8) & 0xFF));
-    //         imgData.put((byte) (pixelValue & 0xFF));
-    //       } else {
-    //         imgData.put((byte) ((pixelValue >> 16 | pixelValue >> 8 | pixelValue) & 0xFF));
-    //       }
-    //     }
-    //   }
-    // }
-
     return imgData;
   }
 
@@ -494,7 +466,7 @@ public class TflitePlugin implements MethodCallHandler {
     }
   }
 
-  private class RunSiameseOnImages extends TfliteTask {
+  private class RunDegOnImages extends TfliteTask {
     ByteBuffer input;
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
@@ -502,7 +474,7 @@ public class TflitePlugin implements MethodCallHandler {
     Object[] inputs;
     float[][] embeddings;
 
-    RunSiameseOnImages(HashMap args, Result result) throws IOException {
+    RunDegOnImages(HashMap args, Result result) throws IOException {
       super(args, result);
 
       String triggerPath = args.get("triggerPath").toString();
@@ -515,6 +487,54 @@ public class TflitePlugin implements MethodCallHandler {
       input = feedInputTensorImage(triggerPath, IMAGE_MEAN, IMAGE_STD);
 
       this.inputs = new Object[]{ input };
+      outputs.put(0, new float[1][512]);
+    }
+
+    protected void runTflite() {
+      tfLite.runForMultipleInputsOutputs(inputs, outputs);
+    }
+
+    protected void onRunTfliteDone() {
+      Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
+      embeddings = ( float[][] )outputs.get( 0 ) ;
+
+      Map<String, Object> ret = new HashMap<>();
+      List<Object> results = new ArrayList<>();
+
+      for (int x = 0; x < 512; ++x) {
+        results.add(embeddings[0][x]);
+      };
+
+      result.success(results);
+    }
+  }
+
+  private class RunDegOnFrame extends TfliteTask {
+    int NUM_RESULTS;
+    float THRESHOLD;
+    long startTime;
+    ByteBuffer imgData;
+    Map<Integer, Object> outputs = new HashMap<>();
+
+    RunDegOnFrame(HashMap args, Result result) throws IOException {
+      super(args, result);
+
+      List<byte[]> bytesList = (ArrayList) args.get("bytesList");
+      double mean = (double) (args.get("imageMean"));
+      float IMAGE_MEAN = (float) mean;
+      double std = (double) (args.get("imageStd"));
+      float IMAGE_STD = (float) std;
+      int imageHeight = (int) (args.get("imageHeight"));
+      int imageWidth = (int) (args.get("imageWidth"));
+      int rotation = (int) (args.get("rotation"));
+      NUM_RESULTS = (int) args.get("numResults");
+      double threshold = (double) args.get("threshold");
+      THRESHOLD = (float) threshold;
+
+      startTime = SystemClock.uptimeMillis();
+
+      imgData = feedInputTensorFrame(bytesList, imageHeight, imageWidth, IMAGE_MEAN, IMAGE_STD, rotation);
+      this.inputs = new Object[]{ imgData };
       outputs.put(0, new float[1][512]);
     }
 

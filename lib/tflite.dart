@@ -25,17 +25,43 @@ class Tflite {
     );
   }
 
-  static Future<List> runSiameseOnImages(
+  static Future<List> runDegOnImages(
       {@required String triggerPath,
       double imageMean = 117.0,
       double imageStd = 1.0,
       bool asynch = true}) async {
     return await _channel.invokeMethod(
-      'runSiameseOnImages',
+      'runDegOnImages',
       {
         "triggerPath": triggerPath,
         "imageMean": imageMean,
         "imageStd": imageStd,
+        "asynch": asynch,
+      },
+    );
+  }
+
+   static Future<List> runDegOnFrame(
+      {@required List<Uint8List> bytesList,
+      int imageHeight = 1280,
+      int imageWidth = 720,
+      double imageMean = 127.5,
+      double imageStd = 127.5,
+      int rotation: 90, // Android only
+      int numResults = 5,
+      double threshold = 0.1,
+      bool asynch = true}) async {
+    return await _channel.invokeMethod(
+      'runDegOnFrame',
+      {
+        "bytesList": bytesList,
+        "imageHeight": imageHeight,
+        "imageWidth": imageWidth,
+        "imageMean": imageMean,
+        "imageStd": imageStd,
+        "rotation": rotation,
+        "numResults": numResults,
+        "threshold": threshold,
         "asynch": asynch,
       },
     );
