@@ -470,7 +470,6 @@ public class TflitePlugin implements MethodCallHandler {
     ByteBuffer input;
     long startTime;
     Map<Integer, Object> outputs = new HashMap<>();
-    float[][] similarity;
     Object[] inputs;
     float[][] embeddings;
 
@@ -515,6 +514,8 @@ public class TflitePlugin implements MethodCallHandler {
     long startTime;
     ByteBuffer imgData;
     Map<Integer, Object> outputs = new HashMap<>();
+    Object[] inputs;
+    float[][] embeddings;
 
     RunDegOnFrame(HashMap args, Result result) throws IOException {
       super(args, result);
