@@ -534,7 +534,7 @@ public class TflitePlugin implements MethodCallHandler {
 
       startTime = SystemClock.uptimeMillis();
 
-      imgData = feedInputTensorFrame(bytesList, imageHeight, imageWidth, IMAGE_MEAN, IMAGE_STD, rotation);
+      ByteBuffer imgData = feedInputTensorFrame(bytesList, imageHeight, imageWidth, IMAGE_MEAN, IMAGE_STD, rotation);
       this.inputs = new Object[]{ imgData };
       outputs.put(0, new float[1][512]);
     }
@@ -713,10 +713,40 @@ public class TflitePlugin implements MethodCallHandler {
 
     ByteBuffer imgData = feedInputTensorFrame(bytesList, imageHeight, imageWidth, IMAGE_MEAN, IMAGE_STD, rotation);
 
-    if (model.equals("SSDMobileNet")) {
-      new RunSSDMobileNet(args, imgData, NUM_RESULTS_PER_CLASS, THRESHOLD, result).executeTfliteTask();
-    } else {
-      new RunYOLO(args, imgData, BLOCK_SIZE, NUM_BOXES_PER_BLOCK, ANCHORS, THRESHOLD, NUM_RESULTS_PER_CLASS, result).executeTfliteTask();
+    new RunDeg(args, imgData, NUM_RESULTS_PER_CLASS, THRESHOLD, result).executeTfliteTask();
+  }
+
+  private class RunDeg extends TfliteTask {
+    float[][] embeddings;
+    Object[] inputArray;
+    Map<Integer, Object> outputMap = new HashMap<>();
+    long startTime;
+
+    RunDeg(HashMap args, ByteBuffer imgData, int numResultsPerClass, float threshold, Result result) {
+      super(args, result);
+      this.outputEmbeddings = new float[1][512];
+      this.inputArray = new Object[]{imgData};
+
+      outputMap.put(0, outputEmbeddings);
+
+      startTime = SystemClock.uptimeMillis();
+    }
+
+    protected void runTflite() {
+      tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
+    }
+
+    protected void onRunTfliteDone() {
+      Log.v("time", "Inference took " + (SystemClock.uptimeMillis() - startTime));
+
+      Map<String, Object> ret = new HashMap<>();
+      List<Object> results = new ArrayList<>();
+
+      for (int x = 0; x < 512; ++x) {
+        results.add(outputEmbeddings[0][x]);
+      };
+
+      result.success(results);
     }
   }
 
