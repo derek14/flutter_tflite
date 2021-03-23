@@ -717,7 +717,7 @@ public class TflitePlugin implements MethodCallHandler {
   }
 
   private class RunDeg extends TfliteTask {
-    float[][] embeddings;
+    float[][] outputEmbeddings;
     Object[] inputArray;
     Map<Integer, Object> outputMap = new HashMap<>();
     long startTime;
